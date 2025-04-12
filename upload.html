@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fish Freshness & Chemical Analysis | CET</title>
+    <meta name="description" content="Deep learning-based fish quality assessment for freshness and formalin detection">
+    <style>
+        :root {
+            --primary: #3563E9;
+            --primary-hover: #2a4fbe;
+            --danger: #D41919;
+            --text-light: #f8f9fa;
+            --text-muted: #A9ACC5;
+            --background: #1B1D2A;
+            --card-bg: #26293B;
+            --input-bg: #31354A;
+            --border: #454861;
+            --accent: #FECF4D;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2rem 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .project-title {
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin: 0.25rem 0;
+            background: linear-gradient(to right, var(--primary), var(--danger));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .header h2 {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        select, input[type="file"] {
+            background: var(--input-bg);
+            color: var(--text-light);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        select:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .price-display {
+            font-size: 0.9rem;
+            color: var(--accent);
+            text-align: right;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-name {
+            margin-top: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        button svg {
+            stroke: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="project-title">Deep Learning Project</div>
+            <h1>Fish Freshness & Chemical Analysis</h1>
+            <h2>College of Engineering Thalassery</h2>
+        </div>
+
+        <form id="fishForm" action="/predict" method="POST" enctype="multipart/form-data" novalidate>
+            <div class="form-group">
+                <label for="fish-type">Select Fish Type</label>
+                <select name="fish_type" id="fish-type" required>
+                    <option value="" disabled selected>-- Choose Fish Type --</option>
+                    <option value="Sardine">Sardine</option>
+                    <option value="Mackerel">Mackerel</option>
+                    <option value="Silver Pomfret">Silver Pomfret</option>
+                    <option value="Tilapia">Tilapia</option>
+                </select>
+            </div>
+
+            <div class="price-display" id="price-display">Select fish type to view price</div>
+
+            <div class="form-group">
+                <label for="file">Upload Fish Image</label>
+                <input 
+                    type="file" 
+                    name="file" 
+                    id="file" 
+                    accept="image/*" 
+                    capture="environment" 
+                    required
+                >
+                <div class="file-name" id="file-name"></div>
+            </div>
+
+            <button type="submit">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor"></line>
+                </svg>
+                Analyze Freshness & Chemical Status
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const fishPrices = {
+            "Sardine": 80,
+            "Mackerel": 60,
+            "Silver Pomfret": 40,
+            "Tilapia": 30
+        };
+
+        const fishTypeSelect = document.getElementById('fish-type');
+        const priceDisplay = document.getElementById('price-display');
+        const fileInput = document.getElementById('file');
+        const fileNameDisplay = document.getElementById('file-name');
+        const form = document.getElementById('fishForm');
+
+        fishTypeSelect.addEventListener('change', function () {
+            const price = fishPrices[this.value];
+            priceDisplay.textContent = price ? `Price: ₹${price}/kg` : 'Select fish type to view price';
+        });
+
+        fileInput.addEventListener('change', function () {
+            fileNameDisplay.textContent = this.files.length > 0 ? this.files[0].name : '';
+        });
+
+        form.addEventListener('submit', function (e) {
+            if (!fishTypeSelect.value || !fileInput.files.length) {
+                e.preventDefault();
+                alert('Please select a fish type and upload an image before submitting.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fish Freshness Result</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.0/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: white;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+        }
+        .result-box {
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .fresh { background-color: #28a745; }
+        .not-fresh { background-color: #dc3545; }
+        .info-box {
+            font-size: 18px;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #2C2C2C;
+            border-radius: 8px;
+        }
+        .highlight { font-weight: bold; color: #FFD700; }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #0056b3; }
+        #barcode { margin-top: 15px; }
+        .formalin-detected { color: #ff4444; font-weight: bold; }
+        .formalin-warning { color: #ffbb33; font-weight: bold; }
+        .formalin-safe { color: #00C851; font-weight: bold; }
+        .footnote {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #aaa;
+            border-top: 1px solid #444;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fish Freshness Result</h1>
+
+        <div class="result-box {{ 'fresh' if prediction == 'Fresh' else 'not-fresh' }}">
+            {{ "✅ Fresh" if prediction == "Fresh" else "❌ Not Fresh" }}
+        </div>
+
+        {% if prediction == 'Fresh' %}
+        <div class="info-box">
+            <p><span class="highlight">Fish Type:</span> {{ fish_type }}</p>
+            <p><span class="highlight">Weight:</span> {{ weight }} g</p>
+            <p><span class="highlight">Formaldehyde Status:</span> 
+                <span class="{% if formaldehyde_ppm < 13 %}formalin-detected
+                           {% elif formaldehyde_ppm < 15 %}formalin-warning
+                           {% else %}formalin-safe{% endif %}">
+                    {% if formaldehyde_ppm < 13 %}Strongly Detected
+                    {% elif formaldehyde_ppm < 15 %}Weakly Detected
+                    {% else %}Not Detected{% endif %}
+                </span>
+            </p>
+            <p><span class="highlight">Formaldehyde PPM:</span> {{ formaldehyde_ppm }}</p>
+            <p><span class="highlight">Total Price:</span> {{ total_price }}</p>
+        </div>
+
+        <svg id="barcode"></svg>
+        <button class="btn" onclick="printBarcode()">🖨️ Print Barcode</button>
+
+        <div class="footnote">
+            <p>Formaldehyde Detection Guidelines:</p>
+            <ul style="text-align: left; margin-left: 20px;">
+                <li><span class="formalin-detected">Strongly Detected</span>: Below 13ppm (Formalin present)</li>
+                <li><span class="formalin-warning">Weakly Detected</span>: 13-16ppm (Possible contamination)</li>
+                <li><span class="formalin-safe">Not Detected</span>: Above 16ppm (Normal fish)</li>
+            </ul>
+            <p>Note: Normal formaldehyde levels in fresh fish typically read ~17ppm</p>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let barcodeData = "{{ fish_type }}_{{ weight }}g_{{ total_price }}";
+                barcodeData = barcodeData.replace(/₹/g, "Rs").replace(/\s+/g, "_");
+                if (barcodeData.trim() !== "") {
+                    JsBarcode("#barcode", barcodeData, {
+                        format: "CODE128",
+                        displayValue: true,
+                        fontSize: 18
+                    });
+                } else {
+                    console.error("Invalid barcode data");
+                }
+            });
+
+            function printBarcode() {
+                let printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Print Barcode</title></head><body>');
+                printWindow.document.write('<h2>Fish Barcode</h2>');
+                printWindow.document.write(document.getElementById("barcode").outerHTML);
+                printWindow.document.close();
+                printWindow.print();
+            }
+        </script>
+        {% endif %}
+
+        <a href="/" class="btn">🔄 Upload Another Image</a>
+    </div>
+</body>
+</html>
