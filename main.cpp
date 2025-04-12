@@ -4,8 +4,8 @@
 #include <math.h>
 
 // WiFi credentials
-#define WIFI_SSID "vivo Y100A"
-#define WIFI_PASSWORD "1111111111"
+#define WIFI_SSID "your wifi name"
+#define WIFI_PASSWORD "passcode"
 
 // Pin configuration
 #define FORMALDEHYDE_PIN 34
