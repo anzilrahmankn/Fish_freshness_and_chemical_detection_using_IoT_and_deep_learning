@@ -1,6 +1,3 @@
-Here's an updated draft for your README file:
-
----
 
 # Fish Freshness and Formaldehyde Detection System
 
