@@ -1,99 +1,104 @@
-# Fish Freshness and Chemical Detection Using IoT and Deep Learning
+Here's an updated draft for your README file:
 
-This project utilizes IoT technologies and deep learning to detect fish freshness and formalin contamination. It employs the **ESP32-WROOM** microcontroller, an **HX711 load cell** for weight measurement, and an **MQ-138** sensor for formalin (formaldehyde) detection. The system communicates wirelessly with a **Flask web application** running on a local server to process the data and provide results.
+---
 
-## Features
-- **ESP32-WROOM** for weight and formalin detection.
-- **HX711 load cell** for accurate weight measurements.
-- **MQ-138 sensor** for detecting formalin levels.
-- **Flask web app** for processing data and generating results.
-- **Machine learning** integration for freshness prediction.
-- **WiFi-based communication** for easy integration with web applications.
+# Fish Freshness and Formaldehyde Detection System
+
+## Overview
+
+This project aims to automate fish freshness detection and formaldehyde (formalin) monitoring using IoT technology. The system utilizes an **ESP32-WROOM** module integrated with sensors such as **HX711 (Load Cell)** for weight measurement and the **MQ-138** sensor for formaldehyde detection. The system generates dynamic pricing for fish based on freshness and weight, alongside QR and barcode generation for each transaction.
+
+### Features:
+- **Formalin Detection:** Alerts if formaldehyde levels exceed safe limits.
+- **Weight Measurement:** Accurate weight calculation using the HX711 and load cell.
+- **Dynamic Pricing Algorithm:** Calculates price based on weight and freshness.
+- **QR and Barcode Generation:** Automatically generates QR codes and barcodes for fish purchases.
+- **No Barcode for Unsafe Fish:** No barcode is printed if formalin levels are detected or if the fish is deemed not fresh.
+
+---
 
 ## Requirements
 
-### Software Requirements
+### Hardware:
+- **ESP32-WROOM** (or compatible)
+- **HX711 Load Cell** for weight measurement
+- **MQ-138 Sensor** for formaldehyde detection
+- **LED (optional)** for formalin alerts
+- **Tare Button** (optional) for resetting weight
+
+### Software:
 - **Python 3.x**
-- **Flask** (For running the web app)
-- **TensorFlow** (For deep learning model)
-- **Git LFS** (For tracking large files)
+- **Flask** (Web framework)
+- **TensorFlow** (For freshness prediction)
+- **Git** for version control
+- **Git LFS** for large file management
 
-### Hardware Requirements
-- **ESP32-WROOM** microcontroller
-- **HX711 load cell**
-- **MQ-138 formaldehyde sensor**
+---
 
-## Setting Up the Project
+## Setup Instructions
 
-### Step 1: Create a Virtual Environment
+### 1. Clone the Repository
+```bash
+git clone https://github.com/anzilrahmankn/Fish_freshness_and_chemical_detection_using_IoT_and_deep_learning.git
+cd Fish_freshness_and_chemical_detection_using_IoT_and_deep_learning
+```
 
-1. Open a terminal (or Command Prompt).
-2. Navigate to your project directory:
-    ```bash
-    cd path/to/project/folder
-    ```
-3. Create a virtual environment:
-    ```bash
-    python -m venv venv
-    ```
-4. Activate the virtual environment:
-    - On **Windows**:
-      ```bash
-      .\venv\Scripts\activate
-      ```
-    - On **Linux/macOS**:
-      ```bash
-      source venv/bin/activate
-      ```
+### 2. Create a Virtual Environment
+To set up a Python virtual environment, run:
+```bash
+python -m venv venv
+```
 
-### Step 2: Install Project Dependencies
+### 3. Install Dependencies
+Activate the virtual environment and install the necessary dependencies:
+```bash
+# Windows
+venv\Scripts\activate
 
-1. Ensure your virtual environment is activated.
-2. Install the required libraries:
-    ```bash
-    pip install -r requirements.txt
-    ```
+# macOS/Linux
+source venv/bin/activate
 
-### Step 3: Download the Deep Learning Model
+pip install -r requirements.txt
+```
 
-The deep learning model file (`model.h5`) is used for freshness prediction. You can download the model from Google Drive:
+### 4. Download Model File (Fish Freshness Model)
+- Download the pre-trained `.h5` model file from [Google Drive](<Google-Drive-Link>).
+- Place it in the `/model/` directory of the project.
 
-- [Download fish freshness model](https://drive.google.com/file/d/1VNAx5jCe_s0v-Si6zXJPVBwuxUni-acZ/view?usp=drive_link)
+### 5. Configure Wi-Fi and Upload to ESP32
+1. Edit the Wi-Fi credentials in the `config.h` file:
+```cpp
+#define WIFI_SSID "your-SSID"
+#define WIFI_PASSWORD "your-PASSWORD"
+```
 
-Once downloaded, place the `.h5` file in the root directory of your project.
+2. Compile and upload the code to the ESP32 using the Arduino IDE or PlatformIO:
+```cpp
+#define FORMALDEHYDE_PIN 34
+#define DT 14
+#define SCK 27
+#define TARE_BUTTON_PIN 5
+#define FORMALIN_LED_PIN 2  // Connected to formaldehyde detection LED
+```
 
-### Step 4: Configure WiFi for ESP32
+### 6. Run the Flask Application
+Run the Flask app to start the web server:
+```bash
+python app.py
+```
+This will start a local server, and you can access the web interface to view freshness results and barcode/QR code generation.
 
-1. Open the **ESP32** source code and update the WiFi credentials in the `config.cpp` file.
-2. Set your WiFi SSID and password:
-    ```cpp
-    const char* ssid = "your_wifi_ssid";
-    const char* password = "your_wifi_password";
-    ```
+### 7. Monitor ESP32 Output
+Open a serial monitor or use a terminal to view the ESP32 outputs. It will print weight and formaldehyde readings in real-time.
 
-### Step 5: Upload Code to ESP32
+### 8. Testing and Debugging
+- Ensure the sensors are correctly connected and calibrated.
+- Use the `TARE_BUTTON_PIN` to reset the weight measurement.
+- Formalin levels above the set threshold will trigger the formalin LED and stop barcode generation.
 
-1. Use the **Arduino IDE** or **PlatformIO** to upload the `esp32_code.cpp` (or equivalent) to the ESP32 microcontroller.
-2. Ensure that the **HX711 load cell** and **MQ-138 sensor** are correctly connected to the ESP32.
-
-### Step 6: Run the Flask Web App
-
-1. Open another terminal window in the project directory.
-2. Run the Flask web app:
-    ```bash
-    python app.py
-    ```
-3. The web app should now be running on your local server, and you can access it through `http://127.0.0.1:5000` or the specified host address.
-
-### Step 7: Test the System
-
-1. Open the **serial terminal** for the ESP32. It will send data regarding the fish weight and formalin levels.
-2. The Flask app will display the fish freshness and pricing on the result page, based on the data received from the ESP32.
-
-## Contributing
-
-Feel free to contribute by reporting issues or submitting pull requests. Any help to improve the project is appreciated!
+---
 
 ## Contact
 
-For further assistance or queries, feel free to contact me at **anzilrahmankn@gmail.com**.
+For any questions or further assistance, feel free to contact:  
+**Email:** anzilrahmankn@gmail.com
